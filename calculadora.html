@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Simples</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 220px; /* Largura fixa para a calculadora */
+        }
+        .calculator-screen {
+            grid-column: span 4;
+            height: 50px;
+            text-align: right;
+            font-size: 24px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        button {
+            height: 50px;
+            font-size: 24px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF; /* Cor de fundo azul */
+            color: white; /* Texto branco */
+            cursor: pointer; /* Mão ao passar o mouse */
+        }
+        button:hover {
+            background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
+        }
+        button[data-action="clear"] {
+            background-color: #dc3545; /* Vermelho para o botão de limpar */
+        }
+        button[data-action="clear"]:hover {
+            background-color: #c82333; /* Vermelho mais escuro ao passar o mouse */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <input type="text" class="calculator-screen" id="screen" disabled />
+        <button class="key--operator" data-action="add">+</button>
+        <button class="key--operator" data-action="subtract">-</button>
+        <button class="key--operator" data-action="multiply">&times;</button>
+        <button class="key--operator" data-action="divide">÷</button>
+
+        <button class="key--number">7</button>
+        <button class="key--number">8</button>
+        <button class="key--number">9</button>
+        <button class="key--operator" data-action="clear">AC</button>
+
+        <button class="key--number">4</button>
+        <button class="key--number">5</button>
+        <button class="key--number">6</button>
+        <button class="key--equal" data-action="calculate">=</button>
+
+        <button class="key--number">1</button>
+        <button class="key--number">2</button>
+        <button class="key--number">3</button>
+        <button data-action="toggle-sign">±</button>
+
+        <button data-action="decimal">.</button>
+        <button class="key--number">0</button>
+    </div>
+
+    <script>
+        const screen = document.getElementById('screen');
+        let currentInput = '';
+        let previousInput = '';
+        let operation = '';
+
+        function updateScreen() {
+            screen.value = currentInput || previousInput || '0';
+        }
+
+        document.querySelectorAll('.key--number').forEach(button => {
+            button.addEventListener('click', () => {
+                currentInput += button.textContent;
+                updateScreen();
+            });
+        });
+
+        document.querySelector('.key--operator[data-action="clear"]').addEventListener('click', () => {
+            currentInput = '';
+            previousInput = '';
+            operation = '';
+            updateScreen();
+        });
+
+        document.querySelectorAll('.key--operator').forEach(button => {
+            button.addEventListener('click', () => {
+                if (currentInput === '') return;
+
+                if (previousInput !== '') {
+                    calculate();
+                }
+
+                operation = button.textContent;
+                previousInput = currentInput;
+                currentInput = '';
+                updateScreen();
+            });
+        });
+
+        document.querySelector('.key--equal').addEventListener('click', calculate);
+
+        // Função para alternar o sinal do número atual
+        document.querySelector('[data-action="toggle-sign"]').addEventListener('click', () => {
+            if (currentInput) {
+                currentInput = (parseFloat(currentInput) * -1).toString();
+                updateScreen();
+            }
+        });
+
+        function calculate() {
+            let result;
+            const num1 = parseFloat(previousInput);
+            const num2 = parseFloat(currentInput);
+
+            switch (operation) {
+                case '+':
+                    result = num1 + num2;
+                    break;
+                case '-':
+                    result = num1 - num2;
+                    break;
+                case '×':
+                    result = num1 * num2;
+                    break;
+                case '÷':
+                    if (num2 === 0) {
+                        alert("Erro: Divisão por zero!");
+                        return;
+                    }
+                    result = num1 / num2;
+                    break;                
+                
+                    return; // Se não houver operação, sai da função
+            }
+
+            currentInput = result.toString();
+            previousInput = '';
+            operation = '';
+            updateScreen();
+        }
+    </script>
+</body>
+</html>
